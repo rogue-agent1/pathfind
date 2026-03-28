@@ -1,28 +1,39 @@
 #!/usr/bin/env python3
-"""Pathfinding — A*, Dijkstra, BFS on 2D grids."""
-import sys, heapq, math
-def astar(grid, start, end):
-    h=lambda a,b:abs(a[0]-b[0])+abs(a[1]-b[1])
+"""pathfind - Grid pathfinding (A*, Dijkstra, BFS)."""
+import sys, heapq
+def astar(grid, start, goal):
     rows,cols=len(grid),len(grid[0])
-    open_set=[(h(start,end),0,start,[start])]; closed=set()
+    def h(a,b): return abs(a[0]-b[0])+abs(a[1]-b[1])
+    open_set=[(h(start,goal),0,start)]; came_from={}; g_score={start:0}
     while open_set:
-        f,g,pos,path=heapq.heappop(open_set)
-        if pos==end: return path,g
-        if pos in closed: continue
-        closed.add(pos)
-        for dr,dc in[(-1,0),(1,0),(0,-1),(0,1)]:
-            nr,nc=pos[0]+dr,pos[1]+dc
-            if 0<=nr<rows and 0<=nc<cols and grid[nr][nc]!=1 and (nr,nc) not in closed:
-                cost=grid[nr][nc] if isinstance(grid[nr][nc],(int,float)) and grid[nr][nc]>0 else 1
-                ng=g+cost; heapq.heappush(open_set,(ng+h((nr,nc),end),ng,(nr,nc),path+[(nr,nc)]))
-    return None,-1
-def cli():
-    grid=[[0]*15 for _ in range(10)]
-    for i in range(2,8): grid[i][5]=1
-    for i in range(0,5): grid[4][i+8]=1
-    path,cost=astar(grid,(0,0),(9,14))
-    ps=set(path) if path else set()
-    for r in range(10):
-        print("  "+"".join("·" if(r,c)in ps else "█" if grid[r][c]==1 else " " for c in range(15)))
-    print(f"  Path length: {len(path) if path else 0}, Cost: {cost}")
-if __name__=="__main__": cli()
+        _,g,current=heapq.heappop(open_set)
+        if current==goal:
+            path=[]; n=goal
+            while n in came_from: path.append(n); n=came_from[n]
+            path.append(start); return list(reversed(path))
+        for dr,dc in [(-1,0),(1,0),(0,-1),(0,1)]:
+            nr,nc=current[0]+dr,current[1]+dc
+            if 0<=nr<rows and 0<=nc<cols and grid[nr][nc]==0:
+                ng=g+1
+                if (nr,nc) not in g_score or ng<g_score[(nr,nc)]:
+                    g_score[(nr,nc)]=ng; came_from[(nr,nc)]=current
+                    heapq.heappush(open_set,(ng+h((nr,nc),goal),ng,(nr,nc)))
+    return None
+def display(grid, path=None):
+    path_set=set(path) if path else set()
+    for r,row in enumerate(grid):
+        line=""
+        for c,cell in enumerate(row):
+            if (r,c) in path_set: line+="·"
+            elif cell==1: line+="█"
+            else: line+=" "
+        print(line)
+if __name__=="__main__":
+    grid=[[0]*20 for _ in range(10)]
+    for r in range(1,8): grid[r][5]=1
+    for r in range(2,9): grid[r][12]=1
+    path=astar(grid,(0,0),(9,19))
+    if path:
+        display(grid,path)
+        print(f"Path length: {len(path)} steps")
+    else: print("No path found")
