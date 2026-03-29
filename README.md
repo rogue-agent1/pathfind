@@ -1,9 +1,8 @@
-# pathfinder-2d
+# pathfind
 
-2D grid pathfinding with A* and Dijkstra. Single-file Python CLI, zero dependencies.
+pathfind: Single-file Python CLI tool. Zero dependencies, Python 3.8+.
 
 ## Usage
-
 ```bash
-python3 pathfind.py
+python3 pathfind.py --test
 ```
