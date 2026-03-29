@@ -1,8 +1,9 @@
 # pathfind
 
-pathfind: Single-file Python CLI tool. Zero dependencies, Python 3.8+.
+Pathfinding (A*, Dijkstra, BFS). Zero dependencies, single file, Python 3.8+.
 
 ## Usage
+
 ```bash
-python3 pathfind.py --test
+python3 pathfind.py --help
 ```
